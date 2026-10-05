@@ -1,69 +1,91 @@
-import Image from "next/image";
+import Header from "@/app/_components/Header";
+import Footer from "@/app/_components/Footer";
+import Features, { FeaturesProps } from "@/app/_components/Features";
+import Badminton from "@/public/icons/badminton.png";
+import Whatsapp from "@/public/icons/whatsapp.png";
+import HomeCard from "@/app/_components/HomeCard";
+import Highlights, { HighlightsProps } from "@/app/_components/Highlights";
+import { Calculator, ChartPie, Share2 } from "lucide-react";
+
+const features: FeaturesProps[] = [
+  { icon: Badminton, text: "Court Fee Calculator" },
+  { icon: Whatsapp, text: "WhatsApp Group Settlement" },
+];
+
+const highlights: HighlightsProps[] = [
+  {
+    icon: <Calculator />,
+    title: "Dynamic Court Ledger",
+    description:
+      "Automatic hourly rate calculation with split costs across doubles, singles, and subbed- in players.",
+    leftInfo: "Court booking + Shuttles",
+    rightInfo: "Zero dispute",
+  },
+  {
+    icon: <ChartPie />,
+    title: "Shuttle Tally Counter",
+    description:
+      "Log feather and nylon shuttle tubes used mid-session. Automatically divided among active players only.",
+    leftInfo: "Tubes logged live",
+    rightInfo: "Pay-as-you-play",
+  },
+  {
+    icon: <Share2 />,
+    title: "One-Click WhatsApp Broadcast",
+    description:
+      "Export formatted break-ups straight to your WhatsApp group with one-tap payment request links.",
+    leftInfo: "Instant breakdown link",
+    rightInfo: "Fast settlement",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <>
+      <Header />
+      <section className="px-6 md:px-0 md:mx-auto pt-10 flex-1 max-w-5xl mb-10">
+        <div className="flex items-center mb-6 justify-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-700 text-white mr-2">
+            🏸
+          </span>
+          <h1 className="font-bold text-4xl md:text-5xl">
+            Shuttle<span className="text-primary">Split</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+        <h2 className="font-bold text-4xl md:text-5xl text-center mb-3">
+          Match day costs,{" "}
+          <span className="font-bold text-primary underline">
+            perfectly <br className="md:block hidden" />
+            divided
+          </span>
+          .
+        </h2>
+        <p className="mb-6 text-center">
+          Split court fees, track shuttles, and settle up with your squad in
+          seconds. <br /> Zero awkward math after match point.
+        </p>
+        <div className="flex items-center justify-center flex-col md:flex-row gap-3 pb-10 w-full">
+          {features.map((feature, index) => (
+            <Features key={index} icon={feature.icon} text={feature.text} />
+          ))}
+        </div>
+        <div className="mb-10 md:mb-16 flex justify-center">
+          <HomeCard />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:px-6">
+          {highlights.map((highlight, index) => (
+            <Highlights
+              key={index}
+              icon={highlight.icon}
+              title={highlight.title}
+              description={highlight.description}
+              leftInfo={highlight.leftInfo}
+              rightInfo={highlight.rightInfo}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+      <Footer />
+    </>
   );
 }
