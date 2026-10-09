@@ -2,11 +2,11 @@
 
 import {
   ArrowRight,
+  AtSign,
   Check,
   Eye,
   EyeOff,
   LockKeyhole,
-  UserRound,
 } from "lucide-react";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
@@ -44,7 +44,7 @@ export default function LoginForm({
           Username
         </label>
         <div className="relative flex items-center">
-          <UserRound
+          <AtSign
             color="#6F7973"
             className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
           />
@@ -67,7 +67,7 @@ export default function LoginForm({
             Password
           </label>
           <Link
-            href="/auth/forgot-password"
+            href="/auth/resetpassword"
             className="text-xs font-semibold text-primary-dark hover:underline"
           >
             Forgot password?

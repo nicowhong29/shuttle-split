@@ -8,7 +8,7 @@ import Image from "next/image";
 
 export default function Header() {
   const pathname = usePathname();
-  const isHomePage = pathname === "/" || "/auth";
+  const isHomePage = ["/", "/auth"].includes(pathname);
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
       <div className="md:mx-auto flex h-16 max-w-4/5 items-center justify-between px-6 md:px-4">
@@ -16,17 +16,19 @@ export default function Header() {
           href="/"
           className="flex items-center gap-2 font-bold text-slate-900 text-lg"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-700 text-white">
+          <span className="flex h-8 w-8 items-center justify-center text-white">
             <Image src={ShuttleIcon} alt="ShuttleIcon" />
           </span>
-          <span>ShuttleSplit</span>
+          <span className="text-2xl">
+            Shuttle<span className="text-primary-dark">Split</span>
+          </span>
         </Link>
 
         {!isHomePage && (
           <>
             <Link
               href="/sessions/new"
-              className="hidden md:flex items-center gap-1.5 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 transition-all"
+              className="hidden md:flex items-center gap-1.5 rounded-lg bg-primary-dark px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary transition-all"
             >
               <Plus className="h-4 w-4" />
               <span>New Session</span>
