@@ -40,7 +40,7 @@ export default function PriceSplit() {
             </div>
           </div>
         </div>
-        <div className="bg-pale p-4 rounded mb-20 md:hidden">
+        <div className="bg-pale p-4 rounded mb-14 md:hidden">
           <div className="grid grid-cols-2 text-xs mb-3 gap-1 [&>*:nth-child(even)]:text-right">
             <span className="text-[#3F4944] font-bold">SPLIT BREAKDOWN</span>
             <span className="font-bold text-[#006C4B]">EQUAL SPLIT</span>

@@ -1,11 +1,11 @@
 "use client";
 
 import AddGuest from "@/app/_components/AddGuest";
+import BackButton from "@/app/_components/BackButton";
 import InputType from "@/app/_components/InputType";
 import Players from "@/app/_components/Players";
 import PriceSplit from "@/app/_components/PriceSplit";
 import {
-  ArrowLeft,
   Calendar,
   MapPin,
   MapPinned,
@@ -23,6 +23,23 @@ const players = [
   { id: 3, initials: "NW", name: "Nico Whong" },
 ];
 
+const formInputs = [
+  {
+    id: 1,
+    title: "TUBE GRADE",
+    placeholder: "e.g. Yonex AS-30",
+    allotment: "pcs / tube",
+    amount: "12",
+  },
+  {
+    id: 2,
+    title: "TUBE PRICE",
+    placeholder: "e.g. RM 40.00",
+    allotment: " / shuttle",
+    amount: "12",
+  },
+];
+
 export default function AddSession() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,11 +48,8 @@ export default function AddSession() {
   };
   return (
     <>
-      <section className="md:mx-auto flex-1 max-w-full md:max-w-4/5 mb-10">
-        <button className="flex items-center bg-white rounded-lg py-1 px-2 mb-6 shadow font-semibold">
-          <ArrowLeft className="mr-2" size={14} />
-          <span className="text-sm">Back to Dashboard</span>
-        </button>
+      <section className="md:mx-auto flex-1 max-w-full md:max-w-4/5 mb-6">
+        <BackButton title="Back to Dashboard" link="/dashboard" />
 
         <div className="flex flex-col mb-4">
           <h1 className="text-4xl font-bold">New Session Setup</h1>
@@ -125,8 +139,9 @@ export default function AddSession() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 mb-4">
-                <InputType />
-                <InputType />
+                {formInputs.map((formInput) => (
+                  <InputType key={formInput.id} {...formInput} />
+                ))}
               </div>
               <div className="bg-pale rounded p-4 flex items-center justify-between relative select-none">
                 <button
@@ -155,13 +170,13 @@ export default function AddSession() {
                       // style={{
                       //   width: `${Math.max(1, inputValue.length) * 0.75 + 0.5}em`,
                       // }}
-                      className="text-md font-extrabold text-[#121927] bg-transparent text-center px-1 py-0.5 transition-all duration-150"
+                      className="w-12 max-w-full text-5xl font-extrabold text-[#121927] bg-transparent text-center px-1 py-0.5 transition-all duration-150"
                     />
                   </div>
 
                   {/* Total Price */}
                   <span className="text-sm font-bold text-[#054A36] tracking-tight">
-                    {/* ${totalPrice} total */}total
+                    {/* ${totalPrice} total */} shuttles opened
                   </span>
                 </div>
                 <button
