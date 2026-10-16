@@ -8,7 +8,7 @@ import Image from "next/image";
 
 export default function Header() {
   const pathname = usePathname();
-  const isHomePage = ["/", "/auth"].includes(pathname);
+  const isHomePage = ["/", "/auth", "/add/session"].includes(pathname);
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
       <div className="md:mx-auto flex h-16 max-w-4/5 items-center justify-between px-6 md:px-4">
