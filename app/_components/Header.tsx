@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ShuttleIcon from "@/public/icons/surfing shuttle logo.svg";
 import Image from "next/image";
+import HeaderDropdown from "@/app/_components/HeaderDropdown";
 
 export default function Header() {
   const pathname = usePathname();
@@ -43,6 +44,15 @@ export default function Header() {
             </Link>
           </>
         )}
+
+        <div className="relative group">
+          <div className="bg-primary text-white font-bold mr-3 w-10 h-10 flex items-center justify-center rounded-full text-xs">
+            <div className="font-bold truncate">NW</div>
+          </div>
+          <div className="absolute right-0 top-full pt-3 w-48 hidden group-hover:block z-50">
+            <HeaderDropdown />
+          </div>
+        </div>
       </div>
     </header>
   );
