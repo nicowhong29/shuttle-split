@@ -8,6 +8,8 @@ interface SignUpFormProps {
   newPassword: string;
   confirmPassword: string;
   showPassword: boolean;
+  newLoading: boolean;
+  newError: string | null;
   setNewEmail: Dispatch<SetStateAction<string>>;
   setNewPassword: Dispatch<SetStateAction<string>>;
   setShowPassword: Dispatch<SetStateAction<boolean>>;
@@ -20,6 +22,7 @@ export default function SignUpForm({
   newPassword,
   confirmPassword,
   showPassword,
+  newError,
   setNewEmail,
   setNewPassword,
   setShowPassword,
@@ -88,6 +91,7 @@ export default function SignUpForm({
             )}
           </button>
         </div>
+        <span className="font-bold text-xs text-red-500">{newError}</span>
       </div>
       <div className="flex flex-col">
         <div className="flex items-center justify-between">

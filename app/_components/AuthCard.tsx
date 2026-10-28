@@ -6,8 +6,10 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import SocialLoginSection from "@/app/_components/SocialLoginSection";
 import SignUpForm from "@/app/_components/SignUpForm";
+import { useHexclaveApp } from "@hexclave/next";
 
 export default function AuthCard() {
+  const app = useHexclaveApp();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -20,6 +22,9 @@ export default function AuthCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  const [newError, setNewError] = useState<string | null>(null);
+  const [newLoading, setNewLoading] = useState(false);
+
   const currentTab = searchParams.get("tab") === "signup" ? "signup" : "login";
 
   const handleTabChange = (tab: "signup" | "login") => {
@@ -28,9 +33,31 @@ export default function AuthCard() {
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(`Submitting ${currentTab} form...`, { rememberMe });
+    setNewError(null);
+    setNewLoading(true);
+    if (currentTab === "signup") {
+      try {
+        const result = await app.signUpWithCredential({
+          email: newEmail,
+          password: newPassword,
+        });
+        if (result.status === "error") {
+          setNewError(result.error.message || "Failed to create account");
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unexpected error occurred";
+        setNewError(errorMessage);
+      } finally {
+        setNewLoading(false);
+      }
+    }
+  };
+
+  const handleOAuthSignIn = async (provider: "google") => {
+    await app.signInWithOAuth(provider);
   };
 
   return (
@@ -99,9 +126,14 @@ export default function AuthCard() {
           setShowPassword={setShowPassword}
           setConfirmPassword={setConfirmPassword}
           handleSubmit={handleSubmit}
+          newLoading={newLoading}
+          newError={newError}
         />
       )}
-      <SocialLoginSection />
+      <SocialLoginSection
+        provider={"google"}
+        handleOAuthSignIn={handleOAuthSignIn}
+      />
     </div>
   );
 }

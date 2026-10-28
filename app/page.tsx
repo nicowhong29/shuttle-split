@@ -6,6 +6,8 @@ import Whatsapp from "@/public/icons/whatsapp.png";
 import HomeCard from "@/app/_components/HomeCard";
 import Highlights, { HighlightsProps } from "@/app/_components/Highlights";
 import { Calculator, ChartPie, Share2 } from "lucide-react";
+import { hexclaveServerApp } from "@/app/hexclave/server";
+import { redirect } from "next/navigation";
 
 const features: FeaturesProps[] = [
   { icon: Badminton, text: "Court Fee Calculator" },
@@ -39,7 +41,12 @@ const highlights: HighlightsProps[] = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const user = await hexclaveServerApp.getUser();
+
+  if (user) {
+    redirect("/dashboard");
+  }
   return (
     <>
       <Header />

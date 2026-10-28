@@ -6,9 +6,12 @@ import { usePathname } from "next/navigation";
 import ShuttleIcon from "@/public/icons/surfing shuttle logo.svg";
 import Image from "next/image";
 import HeaderDropdown from "@/app/_components/HeaderDropdown";
+import { useUser } from "@hexclave/next";
 
 export default function Header() {
   const pathname = usePathname();
+  const user = useUser();
+
   const isHomePage = ["/", "/auth", "/add/session"].includes(pathname);
   return (
     <header className="sticky top-0 z-50 w-full bg-white">
@@ -25,11 +28,11 @@ export default function Header() {
           </span>
         </Link>
 
-        {!isHomePage && (
-          <>
+        {!isHomePage && user !== null && (
+          <div className="flex items-center">
             <Link
               href="/sessions/new"
-              className="hidden md:flex items-center gap-1.5 rounded-lg bg-primary-dark px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary transition-all"
+              className="hidden md:flex items-center gap-1.5 rounded-lg bg-primary-dark px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary transition-all mr-4"
             >
               <Plus className="h-4 w-4" />
               <span>New Session</span>
@@ -42,16 +45,13 @@ export default function Header() {
             >
               <Plus className="h-7 w-7" />
             </Link>
-          </>
-        )}
-
-        {!isHomePage && (
-          <div className="relative group">
-            <div className="bg-primary text-white font-bold mr-3 w-10 h-10 flex items-center justify-center rounded-full text-xs">
-              <div className="font-bold truncate">NW</div>
-            </div>
-            <div className="absolute right-0 top-full pt-3 w-48 hidden group-hover:block z-50">
-              <HeaderDropdown />
+            <div className="relative group">
+              <div className="bg-primary text-white font-bold mr-3 w-10 h-10 flex items-center justify-center rounded-full text-xs">
+                <div className="font-bold truncate">NW</div>
+              </div>
+              <div className="absolute right-0 top-full pt-3 w-48 hidden group-hover:block z-50">
+                <HeaderDropdown />
+              </div>
             </div>
           </div>
         )}
