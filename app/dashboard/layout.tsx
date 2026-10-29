@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 export default async function Layout({ children }: LayoutProps<"/">) {
   const user = await hexclaveServerApp.getUser();
+  console.log(user);
   if (!user) {
     redirect("/");
   }

@@ -7,6 +7,10 @@ import { useState } from "react";
 import SocialLoginSection from "@/app/_components/SocialLoginSection";
 import SignUpForm from "@/app/_components/SignUpForm";
 import { useHexclaveApp } from "@hexclave/next";
+import {
+  clearDisplayNameCookies,
+  setDisplayNameCookies,
+} from "../actions/auth";
 
 export default function AuthCard() {
   const app = useHexclaveApp();
@@ -14,6 +18,8 @@ export default function AuthCard() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,12 +45,18 @@ export default function AuthCard() {
     setNewLoading(true);
     if (currentTab === "signup") {
       try {
+        const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+        if (fullName) {
+          await setDisplayNameCookies(firstName, lastName);
+        }
         const result = await app.signUpWithCredential({
           email: newEmail,
           password: newPassword,
         });
         if (result.status === "error") {
           setNewError(result.error.message || "Failed to create account");
+          await clearDisplayNameCookies();
+          // localStorage.removeItem("displayName");
         }
       } catch (err: unknown) {
         const errorMessage =
@@ -117,9 +129,13 @@ export default function AuthCard() {
         />
       ) : (
         <SignUpForm
+          firstName={firstName}
+          lastName={lastName}
           newEmail={newEmail}
           newPassword={newPassword}
           showPassword={showPassword}
+          setFirstName={setFirstName}
+          setLastName={setLastName}
           setNewEmail={setNewEmail}
           setNewPassword={setNewPassword}
           confirmPassword={confirmPassword}

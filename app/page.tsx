@@ -8,6 +8,7 @@ import Highlights, { HighlightsProps } from "@/app/_components/Highlights";
 import { Calculator, ChartPie, Share2 } from "lucide-react";
 import { hexclaveServerApp } from "@/app/hexclave/server";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 const features: FeaturesProps[] = [
   { icon: Badminton, text: "Court Fee Calculator" },
@@ -49,7 +50,9 @@ export default async function Home() {
   }
   return (
     <>
-      <Header />
+      <Suspense>
+        <Header />
+      </Suspense>
       <section className="px-6 md:px-0 md:mx-auto pt-10 flex-1 max-w-5xl mb-10">
         <div className="flex items-center mb-6 justify-center">
           <span className="flex h-16 w-16 items-center justify-center rounded-lg bg-emerald-700 text-white mr-2">

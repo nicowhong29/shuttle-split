@@ -4,12 +4,16 @@ import { ArrowRight, Eye, EyeOff, LockKeyhole, UserRound } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
 
 interface SignUpFormProps {
+  firstName: string;
+  lastName: string;
   newEmail: string;
   newPassword: string;
   confirmPassword: string;
   showPassword: boolean;
   newLoading: boolean;
   newError: string | null;
+  setFirstName: Dispatch<SetStateAction<string>>;
+  setLastName: Dispatch<SetStateAction<string>>;
   setNewEmail: Dispatch<SetStateAction<string>>;
   setNewPassword: Dispatch<SetStateAction<string>>;
   setShowPassword: Dispatch<SetStateAction<boolean>>;
@@ -18,11 +22,15 @@ interface SignUpFormProps {
 }
 
 export default function SignUpForm({
+  firstName,
+  lastName,
   newEmail,
   newPassword,
   confirmPassword,
   showPassword,
   newError,
+  setFirstName,
+  setLastName,
   setNewEmail,
   setNewPassword,
   setShowPassword,
@@ -34,7 +42,45 @@ export default function SignUpForm({
       onSubmit={handleSubmit}
       className="flex flex-col gap-4 max-w-sm md:max-w-full"
     >
-      <div className="flex flex-col mb-">
+      <div className="flex gap-3">
+        <div className="flex flex-col grow">
+          <label className="font-semibold text-xs mb-1" htmlFor="firstName">
+            First Name
+          </label>
+          <div className="relative flex items-center">
+            <input
+              className="py-2.5 pl-4.5 pr-3 bg-pale rounded w-full grow"
+              id="firstName"
+              type="text"
+              name="firstName"
+              autoComplete="firstName"
+              required
+              placeholder="First name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col grow">
+          <label className="font-semibold text-xs mb-1" htmlFor="lastName">
+            Last Name
+          </label>
+          <div className="relative flex items-center">
+            <input
+              className="py-2.5 pl-4.5 pr-3 bg-pale rounded w-full grow"
+              id="lastName"
+              type="text"
+              name="lastName"
+              autoComplete="lastName"
+              required
+              placeholder="Last name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col">
         <label className="font-semibold text-xs mb-1" htmlFor="newEmail">
           New Email
         </label>
