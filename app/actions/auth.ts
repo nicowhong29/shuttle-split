@@ -25,3 +25,24 @@ export async function clearDisplayNameCookies() {
   const cookieStore = await cookies();
   cookieStore.delete("displayName");
 }
+
+export async function setEmailCookies(email: string) {
+  const cookieStore = await cookies();
+
+  cookieStore.set("email", email, {
+    path: "/",
+    maxAge: 604800,
+    httpOnly: false,
+    sameSite: "lax",
+  });
+}
+
+export async function getEmailCookies() {
+  const cookieStore = await cookies();
+  return cookieStore.get("email")?.value;
+}
+
+export async function clearEmailCookies() {
+  const cookieStore = await cookies();
+  cookieStore.delete("email");
+}

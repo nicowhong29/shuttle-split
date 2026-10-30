@@ -9,7 +9,9 @@ import SignUpForm from "@/app/_components/SignUpForm";
 import { useHexclaveApp } from "@hexclave/next";
 import {
   clearDisplayNameCookies,
+  clearEmailCookies,
   setDisplayNameCookies,
+  setEmailCookies,
 } from "../actions/auth";
 
 export default function AuthCard() {
@@ -27,6 +29,9 @@ export default function AuthCard() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const [newError, setNewError] = useState<string | null>(null);
   const [newLoading, setNewLoading] = useState(false);
@@ -56,7 +61,6 @@ export default function AuthCard() {
         if (result.status === "error") {
           setNewError(result.error.message || "Failed to create account");
           await clearDisplayNameCookies();
-          // localStorage.removeItem("displayName");
         }
       } catch (err: unknown) {
         const errorMessage =
@@ -64,6 +68,27 @@ export default function AuthCard() {
         setNewError(errorMessage);
       } finally {
         setNewLoading(false);
+      }
+    } else {
+      try {
+        if (rememberMe) {
+          await setEmailCookies(email);
+        } else {
+          await clearEmailCookies();
+        }
+        const result = await app.signInWithCredential({
+          email,
+          password,
+        });
+        if (result.status === "error") {
+          setError(result.error.message || "Invalid email or password");
+        }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unexpected error occurred";
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -121,6 +146,8 @@ export default function AuthCard() {
           password={password}
           rememberMe={rememberMe}
           showPassword={showPassword}
+          error={error}
+          loading={loading}
           setEmail={setEmail}
           setPassword={setPassword}
           setRememberMe={setRememberMe}

@@ -9,13 +9,16 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import Link from "next/link";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
+import { getEmailCookies } from "../actions/auth";
 
 interface LoginFormProps {
   email: string;
   password: string;
   rememberMe: boolean;
   showPassword: boolean;
+  error: string | null;
+  loading: boolean;
   setEmail: Dispatch<SetStateAction<string>>;
   setPassword: Dispatch<SetStateAction<string>>;
   setRememberMe: Dispatch<SetStateAction<boolean>>;
@@ -28,12 +31,25 @@ export default function LoginForm({
   password,
   rememberMe,
   showPassword,
+  error,
   setEmail,
   setPassword,
   setRememberMe,
   setShowPassword,
   handleSubmit,
 }: LoginFormProps) {
+  useEffect(() => {
+    async function getEmail() {
+      const email = await getEmailCookies();
+      if (email) {
+        setEmail(email);
+        setRememberMe(true);
+      }
+    }
+
+    getEmail();
+  }, [setEmail, setRememberMe]);
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -102,15 +118,14 @@ export default function LoginForm({
             )}
           </button>
         </div>
+        <span className="font-bold text-xs text-red-500">{error}</span>
       </div>
       <label className="flex items-center gap-2.5 cursor-pointer select-none text-sm text-gray-700">
         <input
           type="checkbox"
           name="remember"
           checked={rememberMe}
-          onChange={(e) =>
-            setRememberMe(e.target.value ? e.target.checked : false)
-          }
+          onChange={(e) => setRememberMe(e.target.checked)}
           className="sr-only"
         />
         <div
