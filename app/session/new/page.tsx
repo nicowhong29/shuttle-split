@@ -25,14 +25,14 @@ const players = [
 
 const formInputs = [
   {
-    id: 1,
+    field: "tubeType" as const,
     title: "TUBE GRADE",
     placeholder: "e.g. Yonex AS-30",
     allotment: "pcs / tube",
     amount: "12",
   },
   {
-    id: 2,
+    field: "tubePrice" as const,
     title: "TUBE PRICE",
     placeholder: "e.g. RM 40.00",
     allotment: " / shuttle",
@@ -41,11 +41,26 @@ const formInputs = [
 ];
 
 export default function AddSession() {
+  const [venue, setVenue] = useState("");
+  const [date, setDate] = useState("");
+  const [courtPrice, setCourtPrice] = useState("");
+  const [tubeType, setTubeType] = useState("");
+  const [tubePrice, setTubePrice] = useState("");
+  const [shuttlesUsed, setShuttlesUsed] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => {
     setIsModalOpen((prev) => !prev);
   };
+
+  const handleIncrement = () => {
+    setShuttlesUsed((prev) => (prev += 1));
+  };
+
+  const handleDecrement = () => {
+    setShuttlesUsed((prev) => (prev -= 1));
+  };
+
   return (
     <>
       <section className="md:mx-auto flex-1 max-w-full md:max-w-4/5 mb-6">
@@ -69,7 +84,7 @@ export default function AddSession() {
                 </div>
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
-                LOCATION
+                VENUE
               </label>
               <div className="relative flex items-center mb-2">
                 <MapPin
@@ -78,14 +93,14 @@ export default function AddSession() {
                 />
                 <input
                   className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
-                  id="email"
-                  type="email"
-                  name="email"
-                  autoComplete="email"
+                  id="venue"
+                  type="text"
+                  name="venue"
+                  autoComplete="venue"
                   required
-                  placeholder="Your email address"
-                  value=""
-                  // onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Venue"
+                  value={venue}
+                  onChange={(e) => setVenue(e.target.value)}
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
@@ -99,13 +114,13 @@ export default function AddSession() {
                 <input
                   className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
                   id="email"
-                  type="email"
-                  name="email"
-                  autoComplete="email"
+                  type="date"
+                  name="date"
+                  autoComplete="date"
                   required
-                  placeholder="Your email address"
-                  value=""
-                  // onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Schedule"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
@@ -117,14 +132,16 @@ export default function AddSession() {
                 </span>
                 <input
                   className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
-                  id="email"
-                  type="email"
-                  name="email"
-                  autoComplete="email"
+                  id="court"
+                  type="number"
+                  name="court"
+                  step="0.01"
+                  autoComplete="court"
+                  min="0"
                   required
-                  placeholder="Your email address"
-                  value=""
-                  // onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Rental Fee"
+                  value={courtPrice}
+                  onChange={(e) => setCourtPrice(e.target.value)}
                 />
               </div>
             </div>
@@ -140,14 +157,27 @@ export default function AddSession() {
               </div>
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {formInputs.map((formInput) => (
-                  <InputType key={formInput.id} {...formInput} />
+                  <InputType
+                    key={formInput.field}
+                    {...formInput}
+                    value={
+                      formInput.field === "tubeType" ? tubeType : tubePrice
+                    }
+                    onChange={(value) => {
+                      if (formInput.field === "tubeType") {
+                        setTubeType(value);
+                      } else {
+                        setTubePrice(value);
+                      }
+                    }}
+                  />
                 ))}
               </div>
               <div className="bg-pale rounded p-4 flex items-center justify-between relative select-none">
                 <button
                   type="button"
-                  // onClick={handleDecrement}
-                  // disabled={count <= 0}
+                  onClick={handleDecrement}
+                  disabled={shuttlesUsed <= 0}
                   aria-label="Decrease shuttles count"
                   className={`w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer
               `}
@@ -157,31 +187,30 @@ export default function AddSession() {
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="relative flex items-center justify-center">
                     <input
-                      // ref={inputRef}
                       type="text"
                       inputMode="numeric"
                       pattern="[0-9]*"
-                      value="1"
-                      // value={inputValue}
-                      // onChange={handleInputChange}
-                      // onFocus={handleInputFocus}
-                      // onBlur={handleInputBlur}
-                      // onKeyDown={handleKeyDown}
-                      // style={{
-                      //   width: `${Math.max(1, inputValue.length) * 0.75 + 0.5}em`,
-                      // }}
+                      value={shuttlesUsed}
+                      onChange={(e) => {
+                        const onlyDigits = e.target.value.replace(/\D/g, "");
+                        const numericValue =
+                          onlyDigits === "" ? 0 : Number(onlyDigits);
+                        setShuttlesUsed(numericValue);
+                      }}
+                      style={{
+                        width: `${Math.max(1, shuttlesUsed) * 0.75 + 0.5}em`,
+                      }}
                       className="w-12 max-w-full text-5xl font-extrabold text-[#121927] bg-transparent text-center px-1 py-0.5 transition-all duration-150"
                     />
                   </div>
 
-                  {/* Total Price */}
                   <span className="text-sm font-bold text-[#054A36] tracking-tight">
-                    {/* ${totalPrice} total */} shuttles opened
+                    shuttles opened
                   </span>
                 </div>
                 <button
                   type="button"
-                  // onClick={handleIncrement}
+                  onClick={handleIncrement}
                   aria-label="Increase shuttles count"
                   className="w-10 h-10 rounded-full bg-[#054A36] hover:bg-[#033B2B] active:bg-[#022D21] shadow-md flex items-center justify-center transition-all duration-150 active:scale-95 cursor-pointer"
                 >
