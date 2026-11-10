@@ -49,6 +49,17 @@ export default function InputType({
                   : whole;
               onChange(price);
             }}
+            onBlur={() => {
+              if (!isPrice || value.trim() === "") {
+                return;
+              }
+
+              const numericValue = Number(value);
+              if (Number.isFinite(numericValue)) {
+                onChange(numericValue.toFixed(2));
+              }
+            }}
+            required
             placeholder={placeholder}
             className="w-full bg-transparent text-sm font-bold text-[#101828] focus:outline-none placeholder:text-slate-300"
           />

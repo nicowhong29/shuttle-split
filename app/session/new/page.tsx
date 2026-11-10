@@ -7,6 +7,7 @@ import Players from "@/app/_components/Players";
 import PriceSplit from "@/app/_components/PriceSplit";
 import {
   Calendar,
+  Hourglass,
   MapPin,
   MapPinned,
   Minus,
@@ -42,12 +43,18 @@ const formInputs = [
 
 export default function AddSession() {
   const [venue, setVenue] = useState("");
+  const [duration, setDuration] = useState("1");
+  const courtDuration = duration === "" ? 0 : Number(duration);
   const [date, setDate] = useState("");
-  const [courtPrice, setCourtPrice] = useState("");
+  const [courtPrice, setCourtPrice] = useState("0");
+  const courtRentalFee = courtPrice === "" ? 0 : Number(courtPrice);
+  const [badmintonPlayers, setBadmintonPlayers] = useState(3);
   const [tubeType, setTubeType] = useState("");
-  const [tubePrice, setTubePrice] = useState("");
+  const [tubePrice, setTubePrice] = useState<number>();
+  const [tubePriceInput, setTubePriceInput] = useState("");
   const [shuttlesUsed, setShuttlesUsed] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const shuttlePrice = tubePrice == null ? 0 : tubePrice / 12;
 
   const handleOpenModal = () => {
     setIsModalOpen((prev) => !prev);
@@ -61,6 +68,21 @@ export default function AddSession() {
     setShuttlesUsed((prev) => (prev -= 1));
   };
 
+  const handleSubmitForm = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = {
+      venue,
+      duration,
+      date,
+      courtPrice: courtRentalFee,
+      tubeType,
+      tubePrice,
+      shuttlesUsed,
+    };
+
+    console.log("Submitted:", formData);
+  };
+
   return (
     <>
       <section className="md:mx-auto flex-1 max-w-full md:max-w-4/5 mb-6">
@@ -72,7 +94,11 @@ export default function AddSession() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <form className="md:col-span-2" action="">
+          <form
+            id="badminton-form"
+            className="md:col-span-2"
+            onSubmit={handleSubmitForm}
+          >
             <div className="bg-white rounded-xl p-4 mb-4">
               <div className="flex items-center mb-5">
                 <div className="bg-primary-light w-10 h-10 flex items-center justify-center rounded-full mr-3">
@@ -126,7 +152,7 @@ export default function AddSession() {
               <label className="font-semibold text-xs mb-1" htmlFor="">
                 COURT RENTAL FEE
               </label>
-              <div className="relative flex items-center">
+              <div className="relative flex items-center mb-4">
                 <span className="absolute left-3.5 h-5 w-5 text-xs text-gray-400 pointer-events-none">
                   RM
                 </span>
@@ -141,7 +167,28 @@ export default function AddSession() {
                   required
                   placeholder="Rental Fee"
                   value={courtPrice}
-                  onChange={(e) => setCourtPrice(e.target.value)}
+                  onChange={(e) => setCourtPrice(e.currentTarget.value)}
+                />
+              </div>
+              <label className="font-semibold text-xs mb-1" htmlFor="">
+                DURATION (hr)
+              </label>
+              <div className="relative flex items-center">
+                <Hourglass
+                  color="#6F7973"
+                  className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
+                />
+                <input
+                  className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                  id="duration"
+                  type="number"
+                  name="duration"
+                  autoComplete="duration"
+                  min="1"
+                  required
+                  placeholder="1"
+                  value={duration}
+                  onChange={(e) => setDuration(e.currentTarget.value)}
                 />
               </div>
             </div>
@@ -161,13 +208,21 @@ export default function AddSession() {
                     key={formInput.field}
                     {...formInput}
                     value={
-                      formInput.field === "tubeType" ? tubeType : tubePrice
+                      formInput.field === "tubeType"
+                        ? tubeType
+                        : tubePriceInput
                     }
                     onChange={(value) => {
                       if (formInput.field === "tubeType") {
                         setTubeType(value);
                       } else {
-                        setTubePrice(value);
+                        setTubePriceInput(value);
+                        const numericPrice = Number(value);
+                        setTubePrice(
+                          value.trim() !== "" && Number.isFinite(numericPrice)
+                            ? numericPrice
+                            : undefined,
+                        );
                       }
                     }}
                   />
@@ -245,7 +300,13 @@ export default function AddSession() {
             </div>
           </form>
           <div className="md:col-span-1">
-            <PriceSplit />
+            <PriceSplit
+              courtDuration={courtDuration}
+              courtRentalFee={courtRentalFee}
+              shuttles={shuttlesUsed}
+              eachShuttlePrice={shuttlePrice}
+              numberOfPlayers={badmintonPlayers}
+            />
           </div>
         </div>
       </section>
