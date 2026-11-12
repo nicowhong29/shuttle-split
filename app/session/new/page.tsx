@@ -16,13 +16,8 @@ import {
   UserPlus,
   Whistle,
 } from "lucide-react";
+import { useUser } from "@hexclave/next";
 import { useState } from "react";
-
-const players = [
-  { id: 1, initials: "NW", name: "Nico Whong" },
-  { id: 2, initials: "NW", name: "Nico Whong" },
-  { id: 3, initials: "NW", name: "Nico Whong" },
-];
 
 const formInputs = [
   {
@@ -35,20 +30,38 @@ const formInputs = [
   {
     field: "tubePrice" as const,
     title: "TUBE PRICE",
-    placeholder: "e.g. RM 40.00",
+    placeholder: "e.g. 40.00",
     allotment: " / shuttle",
     amount: "12",
   },
 ];
 
 export default function AddSession() {
+  const user = useUser();
+  const hostName = user?.displayName?.trim() || "Host";
+  const hostNameParts = hostName.split(/\s+/);
+  const hostInitials =
+    hostNameParts.length > 1
+      ? `${hostNameParts[0][0]}${hostNameParts[hostNameParts.length - 1][0]}`
+      : hostName.slice(0, 2);
+  const players = [
+    {
+      id: 1,
+      initials: hostInitials.toUpperCase(),
+      name: hostName,
+      isHost: true,
+    },
+    { id: 2, initials: "P2", name: "Player 2", isHost: false },
+    { id: 3, initials: "P3", name: "Player 3", isHost: false },
+  ];
+
   const [venue, setVenue] = useState("");
   const [duration, setDuration] = useState("1");
   const courtDuration = duration === "" ? 0 : Number(duration);
   const [date, setDate] = useState("");
   const [courtPrice, setCourtPrice] = useState("0");
   const courtRentalFee = courtPrice === "" ? 0 : Number(courtPrice);
-  const [badmintonPlayers, setBadmintonPlayers] = useState(3);
+  const badmintonPlayers = players.length;
   const [tubeType, setTubeType] = useState("");
   const [tubePrice, setTubePrice] = useState<number>();
   const [tubePriceInput, setTubePriceInput] = useState("");
@@ -78,6 +91,9 @@ export default function AddSession() {
       tubeType,
       tubePrice,
       shuttlesUsed,
+      shuttlePrice,
+      players,
+      numberOfPlayers: badmintonPlayers,
     };
 
     console.log("Submitted:", formData);
@@ -159,15 +175,33 @@ export default function AddSession() {
                 <input
                   className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
                   id="court"
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   name="court"
-                  step="0.01"
                   autoComplete="court"
-                  min="0"
+                  pattern="[0-9]+([.][0-9]{1,2})?"
                   required
                   placeholder="Rental Fee"
                   value={courtPrice}
-                  onChange={(e) => setCourtPrice(e.currentTarget.value)}
+                  onChange={(e) => {
+                    const sanitized = e.currentTarget.value.replace(
+                      /[^0-9.]/g,
+                      "",
+                    );
+                    if (sanitized === "") {
+                      setCourtPrice("0");
+                      return;
+                    }
+
+                    const [whole, ...decimalParts] = sanitized.split(".");
+                    const normalizedWhole =
+                      whole.replace(/^0+(?=\d)/, "") || "0";
+                    setCourtPrice(
+                      decimalParts.length > 0
+                        ? `${normalizedWhole}.${decimalParts.join("").slice(0, 2)}`
+                        : normalizedWhole,
+                    );
+                  }}
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
@@ -208,9 +242,7 @@ export default function AddSession() {
                     key={formInput.field}
                     {...formInput}
                     value={
-                      formInput.field === "tubeType"
-                        ? tubeType
-                        : tubePriceInput
+                      formInput.field === "tubeType" ? tubeType : tubePriceInput
                     }
                     onChange={(value) => {
                       if (formInput.field === "tubeType") {

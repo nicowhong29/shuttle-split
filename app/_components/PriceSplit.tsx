@@ -15,6 +15,7 @@ export default function PriceSplit({
   eachShuttlePrice,
   numberOfPlayers,
 }: PriceSplitProps) {
+  const sessionTotal = shuttles * eachShuttlePrice + courtRentalFee;
   return (
     <>
       <div className="md:bg-white md:rounded-xl md:shadow md:p-6 relative">
@@ -28,10 +29,10 @@ export default function PriceSplit({
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2.5 text-gray-800 font-medium">
               Court Rental
-              {courtDuration == null ? "" : `(${courtDuration} hrs)`}
+              {courtDuration == null ? "" : ` (${courtDuration} hrs)`}
             </div>
             <span className="font-bold text-gray-900">
-              {courtRentalFee == null ? "-" : `RM ${courtRentalFee}`}
+              {courtRentalFee == null ? "-" : `RM ${courtRentalFee.toFixed(2)}`}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -41,12 +42,16 @@ export default function PriceSplit({
                 ? ""
                 : `(${shuttles} × RM ${eachShuttlePrice.toFixed(2)})`}
             </div>
-            <span className="font-bold text-gray-900">-</span>
+            <span className="font-bold text-gray-900">
+              RM {(shuttles * eachShuttlePrice).toFixed(2)}
+            </span>
           </div>
         </div>
         <div className="justify-between items-end mb-6 hidden md:flex">
-          <span className="font-semibold">Session Total</span>
-          <h3 className="font-bold text-primary-dark text-5xl">?</h3>
+          <span className="font-semibold">Total</span>
+          <h3 className="font-bold text-primary-dark text-3xl">
+            RM {sessionTotal.toFixed(2)}
+          </h3>
         </div>
         <div className="bg-pale md:flex items-center p-4 rounded-xl mb-6 hidden">
           <div className="bg-white shadow-xl flex items-center justify-center w-15 h-15 rounded-lg mr-4">
