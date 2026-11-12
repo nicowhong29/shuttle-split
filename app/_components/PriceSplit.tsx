@@ -16,6 +16,7 @@ export default function PriceSplit({
   numberOfPlayers,
 }: PriceSplitProps) {
   const sessionTotal = shuttles * eachShuttlePrice + courtRentalFee;
+  const splitPerPerson = sessionTotal / numberOfPlayers;
   return (
     <>
       <div className="md:bg-white md:rounded-xl md:shadow md:p-6 relative">
@@ -59,10 +60,11 @@ export default function PriceSplit({
           </div>
           <div className="flex flex-col">
             <span className="text-[11px] mb-1">
-              - ÷ {numberOfPlayers == null ? "-" : `${numberOfPlayers} PLAYERS`}
+              {sessionTotal.toFixed(2)} ÷{" "}
+              {numberOfPlayers == null ? "-" : `${numberOfPlayers} PLAYERS`}
             </span>
             <div>
-              <span className="font-bold text-2xl">-</span>
+              <span className="font-bold text-xl">RM {splitPerPerson}</span>
               <span>/ person</span>
             </div>
           </div>
@@ -108,7 +110,7 @@ export default function PriceSplit({
           </div>
           <div className="flex md:flex-col items-center md:items-baseline justify-between">
             <div className="text-2xl md:text-5xl font-bold text-[#68FCBF] md:mb-4">
-              -{" "}
+              RM {splitPerPerson}
               <span className="text-xs text-[#EEF0FF] font-normal">
                 / person
               </span>

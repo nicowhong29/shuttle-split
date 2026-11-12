@@ -1,17 +1,51 @@
+"use client";
+
+import { useState } from "react";
+
+interface NewGuest {
+  name: string;
+  phoneNumber: string;
+}
+
 interface AddGuestProps {
   isOpen: boolean;
   onClose: () => void;
+  onAdd: (guest: NewGuest) => void;
 }
 
-export default function AddGuest({ isOpen, onClose }: AddGuestProps) {
+export default function AddGuest({ isOpen, onClose, onAdd }: AddGuestProps) {
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [nameError, setNameError] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setName("");
+    setPhoneNumber("");
+    setNameError(false);
+    onClose();
+  };
+
+  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      setNameError(true);
+      return;
+    }
+
+    onAdd({ name: trimmedName, phoneNumber: phoneNumber.trim() });
+    handleClose();
+  };
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          onClose();
+          handleClose();
         }
       }}
     >
@@ -46,7 +80,9 @@ export default function AddGuest({ isOpen, onClose }: AddGuestProps) {
             </div>
           </div>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={handleClose}
+            aria-label="Close add guest dialog"
             className="text-gray-400 hover:text-gray-600 p-1 rounded-lg transition-colors"
           >
             ✕
@@ -54,66 +90,76 @@ export default function AddGuest({ isOpen, onClose }: AddGuestProps) {
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-5">
-          {/* Guest Name Input */}
-          <div>
-            <label className="block text-xs font-bold text-gray-800 mb-1.5">
-              Guest Name <span className="text-red-500">*</span>
-            </label>
-            <div className="flex items-center bg-[#F4F7FE] border border-indigo-50 rounded-xl px-3.5 py-3 text-sm text-gray-900">
-              <span className="mr-2 text-[#006C4B]">🪪</span>
-              <input
-                type="text"
-                defaultValue="Liam Tan"
-                className="bg-transparent w-full focus:outline-none font-medium"
-              />
+        <form onSubmit={handleSubmit}>
+          <div className="p-6 space-y-5">
+            <div>
+              <label
+                htmlFor="guest-name"
+                className="block text-xs font-bold text-gray-800 mb-1.5"
+              >
+                Guest Name <span className="text-red-500">*</span>
+              </label>
+              <div className="flex items-center bg-[#F4F7FE] border border-indigo-50 rounded-xl px-3.5 py-3 text-sm text-gray-900">
+                <span className="mr-2 text-[#006C4B]">🪪</span>
+                <input
+                  id="guest-name"
+                  type="text"
+                  value={name}
+                  onChange={(event) => {
+                    setName(event.currentTarget.value);
+                    setNameError(false);
+                  }}
+                  required
+                  className="bg-transparent w-full focus:outline-none font-medium"
+                />
+              </div>
+              {nameError && (
+                <p className="mt-1 text-xs text-red-600" role="alert">
+                  Enter a guest name.
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label
+                htmlFor="guest-phone"
+                className="block text-xs font-bold text-gray-800 mb-1.5"
+              >
+                Contact / WhatsApp{" "}
+                <span className="text-gray-400 font-normal">(Optional)</span>
+              </label>
+              <div className="flex items-center bg-[#F4F7FE] border border-indigo-50 rounded-xl px-3.5 py-3 text-sm text-gray-900">
+                <span className="mr-2 text-[#006C4B]">📞</span>
+                <input
+                  id="guest-phone"
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(event) =>
+                    setPhoneNumber(event.currentTarget.value)
+                  }
+                  className="bg-transparent w-full focus:outline-none font-medium"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Contact Input */}
-          <div>
-            <label className="block text-xs font-bold text-gray-800 mb-1.5">
-              Contact / WhatsApp{" "}
-              <span className="text-gray-400 font-normal">(Optional)</span>
-            </label>
-            <div className="flex items-center bg-[#F4F7FE] border border-indigo-50 rounded-xl px-3.5 py-3 text-sm text-gray-900">
-              <span className="mr-2 text-[#006C4B]">📞</span>
-              <input
-                type="text"
-                defaultValue="+65 9812 3456"
-                className="bg-transparent w-full focus:outline-none font-medium"
-              />
-            </div>
+          {/* Footer Actions */}
+          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-5 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="bg-[#003824] hover:bg-[#00281a] text-white text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
+            >
+              Add to Session (+1 Player) →
+            </button>
           </div>
-
-          {/* Checkbox */}
-          <div className="flex items-center gap-2.5 pt-1">
-            <input
-              type="checkbox"
-              defaultChecked
-              className="w-4 h-4 rounded text-[#006C4B] focus:ring-[#006C4B] accent-[#004532]"
-            />
-            <span className="text-xs text-gray-700 font-medium">
-              Save to frequent guest list for future sessions
-            </span>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50/50 border-t border-gray-100">
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 text-xs font-semibold text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-[#003824] hover:bg-[#00281a] text-white text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
-          >
-            Add to Session (+1 Player) →
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

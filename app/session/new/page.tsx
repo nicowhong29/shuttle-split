@@ -17,7 +17,7 @@ import {
   Whistle,
 } from "lucide-react";
 import { useUser } from "@hexclave/next";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const formInputs = [
   {
@@ -36,24 +36,35 @@ const formInputs = [
   },
 ];
 
+interface GuestPlayer {
+  id: number;
+  initials: string;
+  name: string;
+  phoneNumber: string;
+  isHost: false;
+  amountOwed: string;
+  hasPaid: boolean;
+}
+
 export default function AddSession() {
   const user = useUser();
+  console.log(user);
   const hostName = user?.displayName?.trim() || "Host";
   const hostNameParts = hostName.split(/\s+/);
   const hostInitials =
     hostNameParts.length > 1
       ? `${hostNameParts[0][0]}${hostNameParts[hostNameParts.length - 1][0]}`
       : hostName.slice(0, 2);
-  const players = [
-    {
-      id: 1,
-      initials: hostInitials.toUpperCase(),
-      name: hostName,
-      isHost: true,
-    },
-    { id: 2, initials: "P2", name: "Player 2", isHost: false },
-    { id: 3, initials: "P3", name: "Player 3", isHost: false },
-  ];
+  const [guestPlayers, setGuestPlayers] = useState<GuestPlayer[]>([]);
+  const nextGuestPlayerId = useRef(4);
+  const hostPlayer = {
+    id: 1,
+    initials: hostInitials.toUpperCase(),
+    name: hostName,
+    isHost: true,
+  };
+  const players =
+    guestPlayers.length === 0 ? [hostPlayer] : [hostPlayer, ...guestPlayers];
 
   const [venue, setVenue] = useState("");
   const [duration, setDuration] = useState("1");
@@ -79,6 +90,39 @@ export default function AddSession() {
 
   const handleDecrement = () => {
     setShuttlesUsed((prev) => (prev -= 1));
+  };
+
+  const handleRemovePlayer = (playerId: number) => {
+    setGuestPlayers((currentPlayers) =>
+      currentPlayers.filter((player) => player.id !== playerId),
+    );
+  };
+
+  const handleAddGuest = ({
+    name,
+    phoneNumber,
+  }: {
+    name: string;
+    phoneNumber: string;
+  }) => {
+    const nameParts = name.split(/\s+/);
+    const initials =
+      nameParts.length > 1
+        ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+        : name.slice(0, 2);
+
+    setGuestPlayers((currentPlayers) => [
+      ...currentPlayers,
+      {
+        id: nextGuestPlayerId.current++,
+        initials: initials.toUpperCase(),
+        name,
+        phoneNumber,
+        isHost: false,
+        amountOwed: "",
+        hasPaid: false,
+      },
+    ]);
   };
 
   const handleSubmitForm = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -319,10 +363,15 @@ export default function AddSession() {
               </div>
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {players.map((player) => (
-                  <Players key={player.id} {...player} />
+                  <Players
+                    key={player.id}
+                    {...player}
+                    onRemove={() => handleRemovePlayer(player.id)}
+                  />
                 ))}
               </div>
               <button
+                type="button"
                 className="flex items-center justify-center bg-pale text-primary-dark w-full h-11 rounded"
                 onClick={handleOpenModal}
               >
@@ -342,7 +391,11 @@ export default function AddSession() {
           </div>
         </div>
       </section>
-      <AddGuest isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddGuest
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAdd={handleAddGuest}
+      />
     </>
   );
 }
