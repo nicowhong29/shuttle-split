@@ -64,7 +64,9 @@ export default function PriceSplit({
               {numberOfPlayers == null ? "-" : `${numberOfPlayers} PLAYERS`}
             </span>
             <div>
-              <span className="font-bold text-xl">RM {splitPerPerson}</span>
+              <span className="font-bold text-xl">
+                RM {splitPerPerson.toFixed(2)}
+              </span>
               <span>/ person</span>
             </div>
           </div>
@@ -109,11 +111,8 @@ export default function PriceSplit({
             SPLIT PER PERSON
           </div>
           <div className="flex md:flex-col items-center md:items-baseline justify-between">
-            <div className="text-2xl md:text-5xl font-bold text-[#68FCBF] md:mb-4">
-              RM {splitPerPerson}
-              <span className="text-xs text-[#EEF0FF] font-normal">
-                / person
-              </span>
+            <div className="text-2xl md:text-4xl font-bold text-[#68FCBF] md:mb-4">
+              RM {splitPerPerson.toFixed(2)}
             </div>
             <button
               type="submit"

@@ -26,6 +26,7 @@ const formInputs = [
     placeholder: "e.g. Yonex AS-30",
     allotment: "pcs / tube",
     amount: "12",
+    optional: true,
   },
   {
     field: "tubePrice" as const,
@@ -33,6 +34,7 @@ const formInputs = [
     placeholder: "e.g. 40.00",
     allotment: " / shuttle",
     amount: "12",
+    optional: false,
   },
 ];
 
@@ -132,7 +134,7 @@ export default function AddSession() {
       duration,
       date,
       courtPrice: courtRentalFee,
-      tubeType,
+      tubeType: tubeType || "Generic",
       tubePrice,
       shuttlesUsed,
       shuttlePrice,
@@ -170,7 +172,7 @@ export default function AddSession() {
                 </div>
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
-                VENUE
+                VENUE <span className="text-red-500">*</span>
               </label>
               <div className="relative flex items-center mb-2">
                 <MapPin
@@ -190,7 +192,7 @@ export default function AddSession() {
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
-                TIME
+                TIME <span className="text-red-500">*</span>
               </label>
               <div className="relative flex items-center mb-4">
                 <Calendar
@@ -210,7 +212,7 @@ export default function AddSession() {
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
-                COURT RENTAL FEE
+                COURT RENTAL FEE <span className="text-red-500">*</span>
               </label>
               <div className="relative flex items-center mb-4">
                 <span className="absolute left-3.5 h-5 w-5 text-xs text-gray-400 pointer-events-none">
@@ -249,7 +251,7 @@ export default function AddSession() {
                 />
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
-                DURATION (hr)
+                DURATION (hr) <span className="text-red-500">*</span>
               </label>
               <div className="relative flex items-center">
                 <Hourglass

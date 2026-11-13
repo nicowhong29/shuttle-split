@@ -5,6 +5,7 @@ interface InputTypeProps {
   placeholder: string;
   allotment: string;
   amount: string;
+  optional: boolean;
   onChange: (value: string) => void;
 }
 
@@ -15,6 +16,7 @@ export default function InputType({
   placeholder,
   allotment,
   amount,
+  optional,
   onChange,
 }: InputTypeProps) {
   const isPrice = field === "tubePrice";
@@ -26,7 +28,7 @@ export default function InputType({
           htmlFor={`tube-${field}`}
           className="block text-[11px] font-bold text-[#5B6B7C] tracking-wider uppercase select-none"
         >
-          {title}
+          {title} {!optional && <span className="text-red-500">*</span>}
         </label>
 
         <div className="relative flex items-center">
@@ -59,7 +61,7 @@ export default function InputType({
                 onChange(numericValue.toFixed(2));
               }
             }}
-            required
+            required={!optional}
             placeholder={placeholder}
             className="w-full bg-transparent text-sm font-bold text-[#101828] focus:outline-none placeholder:text-slate-300"
           />
