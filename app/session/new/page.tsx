@@ -5,6 +5,7 @@ import BackButton from "@/app/_components/BackButton";
 import InputType from "@/app/_components/InputType";
 import Players from "@/app/_components/Players";
 import PriceSplit from "@/app/_components/PriceSplit";
+import { createSession } from "@/app/actions/sessions";
 import {
   Calendar,
   Hourglass,
@@ -17,6 +18,7 @@ import {
   Whistle,
 } from "lucide-react";
 import { useUser } from "@hexclave/next";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 const formInputs = [
@@ -49,6 +51,7 @@ interface GuestPlayer {
 }
 
 export default function AddSession() {
+  const router = useRouter();
   const user = useUser();
   console.log(user);
   const hostName = user?.displayName?.trim() || "Host";
@@ -80,6 +83,9 @@ export default function AddSession() {
   const [tubePriceInput, setTubePriceInput] = useState("");
   const [shuttlesUsed, setShuttlesUsed] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [savedSessionId, setSavedSessionId] = useState<string | null>(null);
   const shuttlePrice = tubePrice == null ? 0 : tubePrice / 12;
 
   const handleOpenModal = () => {
@@ -87,14 +93,17 @@ export default function AddSession() {
   };
 
   const handleIncrement = () => {
+    setSavedSessionId(null);
     setShuttlesUsed((prev) => (prev += 1));
   };
 
   const handleDecrement = () => {
+    setSavedSessionId(null);
     setShuttlesUsed((prev) => (prev -= 1));
   };
 
   const handleRemovePlayer = (playerId: number) => {
+    setSavedSessionId(null);
     setGuestPlayers((currentPlayers) =>
       currentPlayers.filter((player) => player.id !== playerId),
     );
@@ -107,6 +116,7 @@ export default function AddSession() {
     name: string;
     phoneNumber: string;
   }) => {
+    setSavedSessionId(null);
     const nameParts = name.split(/\s+/);
     const initials =
       nameParts.length > 1
@@ -127,22 +137,46 @@ export default function AddSession() {
     ]);
   };
 
-  const handleSubmitForm = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmitForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = {
-      venue,
-      duration,
-      date,
-      courtPrice: courtRentalFee,
-      tubeType: tubeType || "Generic",
-      tubePrice,
-      shuttlesUsed,
-      shuttlePrice,
-      players,
-      numberOfPlayers: badmintonPlayers,
-    };
 
-    console.log("Submitted:", formData);
+    setSubmissionError(null);
+    setSavedSessionId(null);
+    if (tubePrice == null || !Number.isFinite(tubePrice)) {
+      setSubmissionError("Enter a valid tube price.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await createSession({
+        venue,
+        sessionDate: date,
+        courtCost: courtRentalFee,
+        courtDuration,
+        shuttleType: tubeType.trim() || "Generic",
+        tubePrice,
+        shuttlesUsed,
+        guests: guestPlayers.map(({ name, phoneNumber }) => ({
+          name,
+          phoneNumber,
+        })),
+      });
+
+      if ("error" in result) {
+        setSubmissionError(result.error);
+        return;
+      }
+
+      setSavedSessionId(result.sessionId);
+      router.replace("/dashboard");
+    } catch (error) {
+      console.error("Could not submit the session.", error);
+      setSubmissionError("Could not save the session. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -160,7 +194,18 @@ export default function AddSession() {
             id="badminton-form"
             className="md:col-span-2"
             onSubmit={handleSubmitForm}
+            onChange={() => setSavedSessionId(null)}
           >
+            {submissionError && (
+              <p className="mb-4 text-sm text-red-600" role="alert">
+                {submissionError}
+              </p>
+            )}
+            {savedSessionId && (
+              <p className="mb-4 text-sm text-primary-dark" role="status">
+                Session saved successfully.
+              </p>
+            )}
             <div className="bg-white rounded-xl p-4 mb-4">
               <div className="flex items-center mb-5">
                 <div className="bg-primary-light w-10 h-10 flex items-center justify-center rounded-full mr-3">
@@ -389,6 +434,8 @@ export default function AddSession() {
               shuttles={shuttlesUsed}
               eachShuttlePrice={shuttlePrice}
               numberOfPlayers={badmintonPlayers}
+              isSubmitting={isSubmitting}
+              isSaved={savedSessionId !== null}
             />
           </div>
         </div>

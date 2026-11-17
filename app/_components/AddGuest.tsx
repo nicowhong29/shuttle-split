@@ -156,7 +156,7 @@ export default function AddGuest({ isOpen, onClose, onAdd }: AddGuestProps) {
               type="submit"
               className="bg-[#003824] hover:bg-[#00281a] text-white text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-2 transition-colors shadow-sm"
             >
-              Add to Session (+1 Player) →
+              Add to Session
             </button>
           </div>
         </form>

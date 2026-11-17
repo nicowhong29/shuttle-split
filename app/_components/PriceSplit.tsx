@@ -1,4 +1,4 @@
-import { Calculator } from "lucide-react";
+import { Calculator, CircleCheck } from "lucide-react";
 
 interface PriceSplitProps {
   courtDuration: number;
@@ -6,6 +6,8 @@ interface PriceSplitProps {
   shuttles: number;
   eachShuttlePrice: number;
   numberOfPlayers: number;
+  isSubmitting?: boolean;
+  isSaved?: boolean;
 }
 
 export default function PriceSplit({
@@ -14,6 +16,8 @@ export default function PriceSplit({
   shuttles,
   eachShuttlePrice,
   numberOfPlayers,
+  isSubmitting = false,
+  isSaved = false,
 }: PriceSplitProps) {
   const sessionTotal = shuttles * eachShuttlePrice + courtRentalFee;
   const splitPerPerson = sessionTotal / numberOfPlayers;
@@ -117,9 +121,23 @@ export default function PriceSplit({
             <button
               type="submit"
               form="badminton-form"
-              className="md:w-full md:justify-center bg-primary-light text-primary-dark cursor-pointer font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"
+              disabled={isSubmitting || isSaved}
+              aria-label={
+                isSaved
+                  ? "Session saved"
+                  : isSubmitting
+                    ? "Saving session"
+                    : "Split now"
+              }
+              className="md:w-full md:justify-center bg-primary-light text-primary-dark cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors"
             >
-              Split Now →
+              {isSaved ? (
+                <CircleCheck aria-hidden="true" />
+              ) : isSubmitting ? (
+                "Saving..."
+              ) : (
+                "Split Now →"
+              )}
             </button>
           </div>
         </div>
