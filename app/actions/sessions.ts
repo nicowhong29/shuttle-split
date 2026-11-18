@@ -5,6 +5,8 @@ import { sql } from "@/app/lib/db";
 
 interface CreateSessionInput {
   venue: string;
+  courtNumber: number;
+  courtTime: string;
   sessionDate: string;
   courtCost: number;
   courtDuration: number;
@@ -43,6 +45,8 @@ function isCreateSessionInput(value: unknown): value is CreateSessionInput {
   const input = value as Record<string, unknown>;
   return (
     typeof input.venue === "string" &&
+    typeof input.courtNumber === "number" &&
+    typeof input.courtTime === "string" &&
     typeof input.sessionDate === "string" &&
     typeof input.courtCost === "number" &&
     typeof input.courtDuration === "number" &&
@@ -84,9 +88,14 @@ export async function createSession(
     new Date(`${input.sessionDate}T00:00:00Z`)
       .toISOString()
       .startsWith(input.sessionDate);
+  const courtTimeIsValid =
+    /^(?:[01]\d|2[0-3]):(?:00|30)$/.test(input.courtTime);
 
   if (
     !venueName ||
+    !Number.isInteger(input.courtNumber) ||
+    input.courtNumber < 1 ||
+    !courtTimeIsValid ||
     !dateIsValid ||
     !Number.isFinite(input.courtCost) ||
     input.courtCost < 0 ||
@@ -143,6 +152,8 @@ export async function createSession(
         INSERT INTO sessions (
           organizer_id,
           venue_name,
+          court_number,
+          court_time,
           session_date,
           court_cost,
           court_duration,
@@ -154,6 +165,8 @@ export async function createSession(
         VALUES (
           ${user.id},
           ${venueName},
+          ${input.courtNumber},
+          ${input.courtTime},
           ${input.sessionDate},
           ${courtCostCents / 100},
           ${input.courtDuration},

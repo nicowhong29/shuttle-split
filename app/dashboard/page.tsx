@@ -8,7 +8,10 @@ import {
   Whistle,
 } from "lucide-react";
 import FilterSection from "@/app/_components/FilterSection";
-import Details from "@/app/_components/Details";
+import Details, { type DetailsProps } from "@/app/_components/Details";
+import { hexclaveServerApp } from "@/app/hexclave/server";
+import { sql } from "@/app/lib/db";
+import { redirect } from "next/navigation";
 
 const dashboards = [
   {
@@ -38,62 +41,60 @@ const dashboards = [
   },
 ];
 
-const sessions = [
-  {
-    id: 1,
-    courtNumber: "12",
-    venue: "222 Badminton Court",
-    date: "10 Oct",
-    time: "9.30 AM",
-    duration: "1.5",
-    players: "Nico, Aqeemul",
-    courtPrice: "RM 12.00",
-    shuttlePrice: "RM 2",
-    totalPrice: "RM 24.00",
-    individualPrice: "RM 6.00",
-    playersPaid: "1",
-    totalPlayers: "2",
-    remainingPaid: "RM 6.00",
-    numberOfShuttles: "1",
-    typeOfShuttles: "Yonex AS-30",
-  },
-  {
-    id: 2,
-    courtNumber: "6",
-    venue: "222 Badminton Court",
-    date: "20 Oct",
-    time: "8.30 AM",
-    duration: "1.5",
-    players: "Nico, Aqeemul, Han Wey",
-    courtPrice: "RM 12.00",
-    shuttlePrice: "RM 2",
-    totalPrice: "RM 24.00",
-    individualPrice: "RM 6.00",
-    playersPaid: "1",
-    totalPlayers: "3",
-    numberOfShuttles: "3",
-    typeOfShuttles: "Yonex AS-30",
-  },
-  {
-    id: 3,
-    courtNumber: "6",
-    venue: "222 Badminton Court",
-    date: "20 Oct",
-    time: "8.30 AM",
-    duration: "1.5",
-    players: "Nico, Aqeemul, Han Wey",
-    courtPrice: "RM 12.00",
-    shuttlePrice: "RM 2",
-    totalPrice: "RM 24.00",
-    individualPrice: "RM 6.00",
-    playersPaid: "1",
-    totalPlayers: "3",
-    numberOfShuttles: "4",
-    typeOfShuttles: "Yonex AS-30",
-  },
-];
+export default async function Dashboard() {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    redirect("/");
+  }
 
-export default function Dashboard() {
+  const sessions = await sql`
+    SELECT
+      s.id,
+      s.venue_name,
+      s.court_number,
+      TO_CHAR(s.court_time, 'HH12:MI AM') AS court_time,
+      TO_CHAR(s.session_date, 'Mon DD, YYYY') AS session_date,
+      s.court_cost,
+      s.court_duration,
+      s.shuttle_type,
+      s.shuttle_cost,
+      COALESCE(s.shuttles_used, 0) AS shuttles_used,
+      s.total_cost,
+      COUNT(p.id)::integer AS total_players,
+      COUNT(p.id) FILTER (WHERE p.has_paid = true)::integer AS players_paid
+    FROM sessions s
+    LEFT JOIN session_participants p ON p.session_id = s.id
+    WHERE s.organizer_id = ${user.id}
+    GROUP BY s.id
+    ORDER BY s.session_date DESC
+  `;
+
+  const sessionCards: (DetailsProps & { id: string })[] = sessions.map(
+    (session) => {
+      const totalPlayers = Number(session.total_players);
+      const totalCost = Number(session.total_cost);
+
+      return {
+        id: session.id,
+        courtNumber: String(session.court_number),
+        venue: session.venue_name,
+        date: session.session_date,
+        time: session.court_time,
+        duration: String(session.court_duration),
+        courtPrice: `RM ${Number(session.court_cost).toFixed(2)}`,
+        shuttlePrice: `RM ${Number(session.shuttle_cost).toFixed(2)}`,
+        totalPrice: `RM ${totalCost.toFixed(2)}`,
+        individualPrice: `RM ${
+          totalPlayers > 0 ? (totalCost / totalPlayers).toFixed(2) : "0.00"
+        }`,
+        playersPaid: String(session.players_paid),
+        totalPlayers: String(totalPlayers),
+        numberOfShuttles: String(session.shuttles_used),
+        typeOfShuttles: session.shuttle_type,
+      };
+    },
+  );
+
   return (
     <section className="md:mx-auto pt-10 flex-1 max-w-full md:max-w-4/5 mb-10">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -113,9 +114,13 @@ export default function Dashboard() {
         <FilterSection />
       </div>
       <h2 className="text-2xl font-semibold mb-6">Sessions</h2>
-      {sessions.map((session) => (
-        <Details key={session.id} {...session} />
-      ))}
+      {sessionCards.length === 0 ? (
+        <div className="text-center text-3xl font-bold">
+          No sessions available
+        </div>
+      ) : (
+        sessionCards.map((session) => <Details key={session.id} {...session} />)
+      )}
     </section>
   );
 }

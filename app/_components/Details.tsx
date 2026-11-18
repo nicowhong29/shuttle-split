@@ -1,10 +1,10 @@
 import { Dot } from "lucide-react";
 
-interface DetailsProps {
-  courtNumber: string;
+export interface DetailsProps {
+  courtNumber?: string;
   venue: string;
   date: string;
-  time: string;
+  time?: string;
   duration: string;
   courtPrice: string;
   shuttlePrice: string;
@@ -38,15 +38,22 @@ export default function Details({
           <div className="flex flex-col">
             <div className="flex flex-col md:flex-row md:items-center mb-2 md:mb-1">
               <div className="flex items-center mb-2 md:mb-0">
-                <span className="bg-pale-dark text-sm px-4 py-1 rounded-lg font-semibold mr-4">
-                  Court {courtNumber}
-                </span>
+                {courtNumber && (
+                  <span className="bg-pale-dark text-sm px-4 py-1 rounded-lg font-semibold mr-4">
+                    Court {courtNumber}
+                  </span>
+                )}
                 <span className="font-bold text-lg mr-1">{venue}</span>
               </div>
               <div className="flex items-center">
-                <Dot className="hidden md:inline-block" />
+                {courtNumber && <Dot className="hidden md:inline-block" />}
                 <span className="flex items-center font-semibold">
-                  {date} <Dot /> {time}
+                  {date}
+                  {time && (
+                    <>
+                      <Dot /> {time}
+                    </>
+                  )}
                 </span>
                 <Dot />
                 <span className="font-semibold">{duration} hrs</span>

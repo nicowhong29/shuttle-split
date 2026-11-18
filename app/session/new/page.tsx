@@ -8,6 +8,8 @@ import PriceSplit from "@/app/_components/PriceSplit";
 import { createSession } from "@/app/actions/sessions";
 import {
   Calendar,
+  Clock,
+  Hash,
   Hourglass,
   MapPin,
   MapPinned,
@@ -19,7 +21,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@hexclave/next";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const formInputs = [
   {
@@ -50,6 +52,20 @@ interface GuestPlayer {
   hasPaid: boolean;
 }
 
+function getNextHalfHourTime() {
+  const nextTime = new Date();
+  const minutesUntilNextInterval = 30 - (nextTime.getMinutes() % 30);
+  nextTime.setMinutes(
+    nextTime.getMinutes() + minutesUntilNextInterval,
+    0,
+    0,
+  );
+
+  return `${String(nextTime.getHours()).padStart(2, "0")}:${String(
+    nextTime.getMinutes(),
+  ).padStart(2, "0")}`;
+}
+
 export default function AddSession() {
   const router = useRouter();
   const user = useUser();
@@ -75,6 +91,8 @@ export default function AddSession() {
   const [duration, setDuration] = useState("1");
   const courtDuration = duration === "" ? 0 : Number(duration);
   const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [courtNumber, setCourtNumber] = useState("");
   const [courtPrice, setCourtPrice] = useState("0");
   const courtRentalFee = courtPrice === "" ? 0 : Number(courtPrice);
   const badmintonPlayers = players.length;
@@ -87,6 +105,14 @@ export default function AddSession() {
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [savedSessionId, setSavedSessionId] = useState<string | null>(null);
   const shuttlePrice = tubePrice == null ? 0 : tubePrice / 12;
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setTime((currentTime) => currentTime || getNextHalfHourTime());
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const handleOpenModal = () => {
     setIsModalOpen((prev) => !prev);
@@ -152,6 +178,8 @@ export default function AddSession() {
     try {
       const result = await createSession({
         venue,
+        courtNumber: Number(courtNumber),
+        courtTime: time,
         sessionDate: date,
         courtCost: courtRentalFee,
         courtDuration,
@@ -216,45 +244,102 @@ export default function AddSession() {
                   <p className="text-sm">Booking slot and direct court hire</p>
                 </div>
               </div>
-              <label className="font-semibold text-xs mb-1" htmlFor="">
-                VENUE <span className="text-red-500">*</span>
-              </label>
-              <div className="relative flex items-center mb-2">
-                <MapPin
-                  color="#6F7973"
-                  className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
-                />
-                <input
-                  className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
-                  id="venue"
-                  type="text"
-                  name="venue"
-                  autoComplete="venue"
-                  required
-                  placeholder="Venue"
-                  value={venue}
-                  onChange={(e) => setVenue(e.target.value)}
-                />
+              <div className="flex flex-column gap-2">
+                <div className="w-full">
+                  <label className="font-semibold text-xs mb-1" htmlFor="">
+                    VENUE <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center mb-2">
+                    <MapPin
+                      color="#6F7973"
+                      className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
+                    />
+                    <input
+                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                      id="venue"
+                      type="text"
+                      name="venue"
+                      autoComplete="venue"
+                      required
+                      placeholder="Venue"
+                      value={venue}
+                      onChange={(e) => setVenue(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="w-full">
+                  <label className="font-semibold text-xs mb-1" htmlFor="">
+                    COURT NUMBER <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center mb-2">
+                    <Hash
+                      color="#6F7973"
+                      className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
+                    />
+                    <input
+                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                      id="courtNumber"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      name="courtNumber"
+                      autoComplete="courtNumber"
+                      required
+                      placeholder="eg.. 1"
+                      value={courtNumber}
+                      onChange={(e) =>
+                        setCourtNumber(e.currentTarget.value.replace(/\D/g, ""))
+                      }
+                    />
+                  </div>
+                </div>
               </div>
-              <label className="font-semibold text-xs mb-1" htmlFor="">
-                TIME <span className="text-red-500">*</span>
-              </label>
-              <div className="relative flex items-center mb-4">
-                <Calendar
-                  color="#6F7973"
-                  className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
-                />
-                <input
-                  className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
-                  id="email"
-                  type="date"
-                  name="date"
-                  autoComplete="date"
-                  required
-                  placeholder="Schedule"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
+              <div className="flex flex-column gap-2">
+                <div className="w-full">
+                  <label className="font-semibold text-xs mb-1" htmlFor="">
+                    DATE <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center mb-4">
+                    <Calendar
+                      color="#6F7973"
+                      className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
+                    />
+                    <input
+                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                      id="email"
+                      type="date"
+                      name="date"
+                      autoComplete="date"
+                      required
+                      placeholder="Schedule"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="w-full">
+                  <label className="font-semibold text-xs mb-1" htmlFor="">
+                    TIME <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative flex items-center mb-4">
+                    <Clock
+                      color="#6F7973"
+                      className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
+                    />
+                    <input
+                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                      id="time"
+                      type="time"
+                      name="time"
+                      autoComplete="time"
+                      step={1800}
+                      required
+                      placeholder="eg. 8.00AM"
+                      value={time}
+                      onChange={(e) => setTime(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
               <label className="font-semibold text-xs mb-1" htmlFor="">
                 COURT RENTAL FEE <span className="text-red-500">*</span>
