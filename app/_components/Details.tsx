@@ -1,6 +1,8 @@
 import { Dot } from "lucide-react";
+import Link from "next/link";
 
 export interface DetailsProps {
+  id: string;
   courtNumber?: string;
   venue: string;
   date: string;
@@ -17,6 +19,7 @@ export interface DetailsProps {
 }
 
 export default function Details({
+  id,
   courtNumber,
   venue,
   date,
@@ -97,9 +100,12 @@ export default function Details({
               </span>
             </div>
           </div>
-          <button className="bg-primary-dark text-xs md:text-base rounded-xl font-bold px-4 py-2 shadow cursor-pointer text-white hover:bg-primary">
+          <Link
+            href={`/session/${id}`}
+            className="bg-primary-dark text-xs md:text-base rounded-xl font-bold px-4 py-2 shadow cursor-pointer text-white hover:bg-primary"
+          >
             Receipt
-          </button>
+          </Link>
         </div>
       </div>
     </div>

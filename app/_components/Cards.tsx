@@ -23,13 +23,13 @@ export default function Cards({
             {title.toLocaleUpperCase()}
           </h3>
           <div className="flex items-baseline">
-            <span className="text-5xl font-bold mr-1">{info}</span>
+            <span className="text-4xl font-bold mr-1">{info}</span>
             <span className="text-base font-semibold text-primary-dark">
               {secondaryInfo}
             </span>
           </div>
         </div>
-        <div className="bg-pale rounded-2xl p-4">{icon}</div>
+        <div className="bg-pale rounded-2xl p-3">{icon}</div>
       </div>
       <div className="flex items-center">
         <span className="mr-2">{smallIcon}</span>
