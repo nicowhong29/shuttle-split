@@ -2,6 +2,7 @@
 
 import { hexclaveServerApp } from "@/app/hexclave/server";
 import { sql } from "@/app/lib/db";
+import { revalidatePath } from "next/cache";
 
 interface CreateSessionInput {
   venue: string;
@@ -222,5 +223,45 @@ export async function createSession(
   } catch (error) {
     console.error("Failed to save session to Neon.", error);
     return { error: "Could not save the session. Please try again." };
+  }
+}
+
+export async function markParticipantPaid(
+  sessionId: string,
+  participantId: string,
+): Promise<{ success: true } | { error: string }> {
+  const user = await hexclaveServerApp.getUser();
+  if (!user) {
+    return { error: "Please sign in to update payment status." };
+  }
+
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!uuidPattern.test(sessionId) || !uuidPattern.test(participantId)) {
+    return { error: "The session or participant ID is invalid." };
+  }
+
+  try {
+    const updatedParticipants = await sql`
+      UPDATE session_participants AS participant
+      SET has_paid = true
+      FROM sessions AS session
+      WHERE participant.id = ${participantId}
+        AND participant.session_id = session.id
+        AND session.id = ${sessionId}
+        AND session.organizer_id = ${user.id}
+      RETURNING participant.id
+    `;
+
+    if (updatedParticipants.length === 0) {
+      return { error: "Could not find that participant in your session." };
+    }
+
+    revalidatePath(`/session/${sessionId}`);
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to mark participant as paid.", error);
+    return { error: "Could not update payment status. Please try again." };
   }
 }
