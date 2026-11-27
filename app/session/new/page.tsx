@@ -55,11 +55,7 @@ interface GuestPlayer {
 function getNextHalfHourTime() {
   const nextTime = new Date();
   const minutesUntilNextInterval = 30 - (nextTime.getMinutes() % 30);
-  nextTime.setMinutes(
-    nextTime.getMinutes() + minutesUntilNextInterval,
-    0,
-    0,
-  );
+  nextTime.setMinutes(nextTime.getMinutes() + minutesUntilNextInterval, 0, 0);
 
   return `${String(nextTime.getHours()).padStart(2, "0")}:${String(
     nextTime.getMinutes(),
@@ -294,19 +290,19 @@ export default function AddSession() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-column gap-2">
-                <div className="w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="min-w-0">
                   <label className="font-semibold text-xs mb-1" htmlFor="">
                     DATE <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative flex items-center mb-4">
+                  <div className="relative flex items-center md:mb-4">
                     <Calendar
                       color="#6F7973"
                       className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
                     />
                     <input
-                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
-                      id="email"
+                      className="box-border w-full min-w-0 py-2.5 pl-10 pr-3 bg-pale rounded"
+                      id="date"
                       type="date"
                       name="date"
                       autoComplete="date"
@@ -317,17 +313,17 @@ export default function AddSession() {
                     />
                   </div>
                 </div>
-                <div className="w-full">
+                <div className="min-w-0">
                   <label className="font-semibold text-xs mb-1" htmlFor="">
                     TIME <span className="text-red-500">*</span>
                   </label>
-                  <div className="relative flex items-center mb-4">
+                  <div className="relative flex items-center mb-2 md:mb-4">
                     <Clock
                       color="#6F7973"
                       className="absolute left-3.5 h-5 w-5 text-gray-400 pointer-events-none"
                     />
                     <input
-                      className="py-2.5 pl-10 pr-3 bg-pale rounded w-full"
+                      className="box-border w-full min-w-0 py-2.5 pl-10 pr-3 bg-pale rounded"
                       id="time"
                       type="time"
                       name="time"

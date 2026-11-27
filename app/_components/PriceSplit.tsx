@@ -93,20 +93,24 @@ export default function PriceSplit({
                 : `(${shuttles} × RM ${eachShuttlePrice.toFixed(2)})`}
               )
             </span>
-            <span className="font-semibold">-</span>
-            <span className="text-sm font-bold">Session Total</span>
-            <span className="text-sm font-bold">?</span>
+            <span className="font-semibold">
+              RM {(shuttles * eachShuttlePrice).toFixed(2)}
+            </span>
+            <span className="text-sm font-bold">Total</span>
+            <span className="text-sm font-bold">
+              RM {sessionTotal.toFixed(2)}
+            </span>
           </div>
           <div className="grid grid-cols-2 bg-pale-dark p-2.5 text-xs">
             <div className="flex items-center">
               <Calculator className="text-primary" />
               <span>
-                - ÷{" "}
+                {sessionTotal.toFixed(2)} ÷{" "}
                 {numberOfPlayers == null ? "-" : `${numberOfPlayers} PLAYERS`}
               </span>
             </div>
             <span className="flex items-center justify-end text-primary-dark font-bold text-sm">
-              - / person
+              RM {splitPerPerson.toFixed(2)} / person
             </span>
           </div>
         </div>

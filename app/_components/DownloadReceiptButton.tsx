@@ -308,9 +308,7 @@ export function DownloadReceiptButton({
   return (
     <div
       className={
-        mode === "print"
-          ? "hidden md:flex md:flex-col md:items-end"
-          : "flex flex-col items-end"
+        mode === "print" ? "flex flex-col items-end" : "flex flex-col items-end"
       }
     >
       <button

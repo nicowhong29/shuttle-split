@@ -108,7 +108,7 @@ export default async function Page({
   return (
     <section className="md:mx-auto flex-1 max-w-full md:max-w-4/5 mb-6">
       <BackButton title="Back to Dashboard" link="/dashboard" />
-      <div className="flex items-center justify-center md:justify-between mb-2">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex flex-col mb-2 text-center">
           <h1 className="text-2xl md:text-4xl font-bold mb-1 text-left">
             Receipt
@@ -128,7 +128,7 @@ export default async function Page({
             </span>
           </div>
           <div className="flex justify-between mb-3">
-            <div className="flex items-center">
+            <div className="flex items-center basis-2/3">
               <ClockFading size={16} className="mr-1" />
               <span className="text-sm">
                 Court booking fee ({Number(session.court_duration)}h)
@@ -137,7 +137,7 @@ export default async function Page({
             <span className="font-bold text-sm">RM {session.court_cost}</span>
           </div>
           <div className="flex justify-between mb-3">
-            <div className="flex items-center">
+            <div className="flex items-center basis-2/3">
               <CirclePile size={16} className="mr-1" />
               <span className="text-sm">
                 Shuttlecocks ({session.shuttles_used}x {session.shuttle_type})
@@ -197,14 +197,6 @@ export default async function Page({
         <div className="col-span-12 md:col-start-6 md:col-span-7 bg-white shadow rounded-xl p-4 mb-7">
           <Whatsapp {...receiptData} />
         </div>
-        <button className="flex md:hidden items-center bg-[#006C4B] col-span-12 md:col-start-6 md:col-span-7 py-4 justify-center text-white rounded-xl cursor-pointer">
-          <FontAwesomeIcon className="mr-2 w-6 h-6" icon={faWhatsapp} />
-          <span className="font-semibold">Send Summary via WhatsApp</span>
-        </button>
-        <button className="flex md:hidden items-center bg-[#E2E7FF] col-span-12 md:col-start-6 md:col-span-7 py-4 justify-center rounded-xl cursor-pointer">
-          <Link className="mr-2" />
-          <span className="font-semibold">Copy Receipt</span>
-        </button>
       </div>
     </section>
   );
